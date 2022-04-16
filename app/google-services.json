@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "940934596614",
+    "project_id": "journal-7d66f",
+    "storage_bucket": "journal-7d66f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940934596614:android:52d0f3e8c232bf2f7b9b87",
+        "android_client_info": {
+          "package_name": "com.learningandroid.journal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "940934596614-9t0ggn0afa92eune4uk0dfp0puatluag.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCA5okxNucJNsCrYsOdA68Raw4Ucyq5IO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "940934596614-9t0ggn0afa92eune4uk0dfp0puatluag.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

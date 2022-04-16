@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Journal</string>
+    <string name="title_text">Self.Gratitute.Journal</string>
+    <string name="what_are_you_grateful_for_today">what are you grateful for today?</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="login_text">LOGIN</string>
+    <string name="create_account_text">CREATE ACCOUNT</string>
+    <string name="or_text">OR</string>
+    <string name="Username_hint">Username</string>
+    <string name="menu_title">Add Thoughts</string>
+    <string name="signout">Signout</string>
+    <string name="no_thought">Write a new Journal by clicking this \"+\" icon above</string>
+</resources>
