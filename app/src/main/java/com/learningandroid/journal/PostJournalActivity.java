@@ -290,6 +290,7 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
         j.setTimeAdded(new Timestamp(new Date()));
         j.setUserName(currentUserName);
         j.setUserId(currentUserId);
+        j.setJournalId(journal_from_list.getJournalId());
 
         collectionReference.document(journal_from_list.getJournalId())
                 .set(j).addOnSuccessListener(new OnSuccessListener<Void>() {
