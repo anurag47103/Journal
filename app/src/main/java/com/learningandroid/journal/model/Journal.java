@@ -1,8 +1,14 @@
 package com.learningandroid.journal.model;
 
-import com.google.firebase.Timestamp;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Journal {
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Exclude;
+
+public class Journal implements Parcelable {
+
+    @Exclude private String journalId;
     private String title;
     private String thought;
     private String imageUri;
@@ -69,5 +75,48 @@ public class Journal {
         this.userId = userId;
         this.userName = userName;
         this.timeAdded = timeAdded;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(journalId);
+        parcel.writeString(title);
+        parcel.writeString(thought);
+        parcel.writeString(imageUri);
+        parcel.writeString(userId);
+        parcel.writeParcelable(timeAdded, i);
+        parcel.writeString(userName);
+    }
+
+    public static final Parcelable.Creator<Journal> CREATOR = new Parcelable.Creator<Journal>() {
+        public Journal createFromParcel(Parcel in) {
+            return new Journal(in);
+        }
+        public Journal[] newArray(int size) {
+            return new Journal[size];
+        }
+    };
+
+    public String getJournalId() {
+        return journalId;
+    }
+
+    public void setJournalId(String journalId) {
+        this.journalId = journalId;
+    }
+
+    private Journal(Parcel in) {
+        journalId = in.readString();
+        title = in.readString();
+        thought = in.readString();
+        imageUri = in.readString();
+        userId = in.readString();
+        timeAdded = in.readParcelable(Timestamp.class.getClassLoader());
+        userName = in.readString();
     }
 }

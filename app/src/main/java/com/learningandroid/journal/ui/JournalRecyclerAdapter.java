@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Parcelable;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +34,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.learningandroid.journal.JournalListActivity;
+import com.learningandroid.journal.PostJournalActivity;
 import com.learningandroid.journal.R;
 import com.learningandroid.journal.model.Journal;
 import com.squareup.picasso.Picasso;
@@ -101,7 +103,16 @@ public class JournalRecyclerAdapter extends RecyclerView.Adapter<JournalRecycler
                 myIntent.putExtra(Intent.EXTRA_SUBJECT, sub);
                 myIntent.putExtra(Intent.EXTRA_TEXT,body);
                 context.startActivity(Intent.createChooser(myIntent, "Share Using"));
+            }
+        });
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, PostJournalActivity.class);
+                intent.putExtra("toUpdate", 1);
+                intent.putExtra("journal", (Parcelable) journal);
+                context.startActivity(intent);
             }
         });
 
@@ -134,12 +145,7 @@ public class JournalRecyclerAdapter extends RecyclerView.Adapter<JournalRecycler
             name = itemView.findViewById(R.id.journal_row_username);
             shareButton = itemView.findViewById(R.id.journal_row_share_button);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
 
-                }
-            });
 
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
