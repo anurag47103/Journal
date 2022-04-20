@@ -1,6 +1,7 @@
 package com.learningandroid.journal.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +62,21 @@ public class JournalRecyclerAdapter extends RecyclerView.Adapter<JournalRecycler
 
         holder.dateAdded.setText(timeAgo);
         holder.name.setText(journal.getUserName());
+
+        holder.shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                    context.startActivity();
+                Intent myIntent = new Intent(Intent.ACTION_SEND);
+                myIntent.setType("text/plain");
+                String body = journal.getThought();
+                String sub = journal.getTitle();
+                myIntent.putExtra(Intent.EXTRA_SUBJECT, sub);
+                myIntent.putExtra(Intent.EXTRA_TEXT,body);
+                context.startActivity(Intent.createChooser(myIntent, "Share Using"));
+
+            }
+        });
     }
 
     @Override
@@ -89,12 +105,7 @@ public class JournalRecyclerAdapter extends RecyclerView.Adapter<JournalRecycler
             image = itemView.findViewById(R.id.journal_image_list);
             name = itemView.findViewById(R.id.journal_row_username);
             shareButton = itemView.findViewById(R.id.journal_row_share_button);
-            shareButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-//                    context.startActivity();
-                }
-            });
+
 
 
         }
