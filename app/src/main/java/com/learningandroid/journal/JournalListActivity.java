@@ -73,6 +73,7 @@ public class JournalListActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                journalList.clear();
                                 if(!queryDocumentSnapshots.isEmpty()) {
                                     for(QueryDocumentSnapshot journals : queryDocumentSnapshots) {
                                         Journal journal = journals.toObject(Journal.class);

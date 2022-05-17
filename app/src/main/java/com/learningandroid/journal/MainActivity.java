@@ -3,12 +3,17 @@ package com.learningandroid.journal;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -23,8 +28,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.learningandroid.journal.util.JournalApi;
 
 import java.util.Objects;
+import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
+    BiometricPrompt biometricPrompt;
+    androidx.biometric.BiometricPrompt.PromptInfo promptInfo;
+    LinearLayout mMainLayout;
+    
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseUser currentUser;
@@ -39,7 +49,55 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
 
+        mMainLayout = findViewById(R.id.main_layouts);
+
+        BiometricManager biometricManager = BiometricManager.from(this);
+        switch (biometricManager.canAuthenticate()) {
+            case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+                Toast.makeText(this, "Device doesn't have fingerprint scanner", Toast.LENGTH_SHORT).show();
+                break;
+            case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+                Toast.makeText(this, "Not Working", Toast.LENGTH_SHORT).show();
+            case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
+                Toast.makeText(this, "No fingerprint assign", Toast.LENGTH_SHORT).show();
+
+        }
+
+        Executor executor = ContextCompat.getMainExecutor(this);
+
+        biometricPrompt = new androidx.biometric.BiometricPrompt(this, executor, new androidx.biometric.BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(@NonNull androidx.biometric.BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                Toast.makeText(getApplicationContext(), "Login Sucess" , Toast.LENGTH_SHORT).show();;
+                mMainLayout.setVisibility(View.VISIBLE);
+
+                currentUser = firebaseAuth.getCurrentUser();
+                firebaseAuth.addAuthStateListener(authStateListener);
+
+
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+            }
+        });
+
+        promptInfo =  new BiometricPrompt.PromptInfo.Builder().setTitle("Journal")
+                .setDescription("Use FingerPrint To Login")
+                .setDeviceCredentialAllowed(true)
+                .build();
+
+        biometricPrompt.authenticate(promptInfo);
+
         firebaseAuth = FirebaseAuth.getInstance();
+
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -83,6 +141,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
+
+
         getStartedButton = findViewById(R.id.startButton);
 
         getStartedButton.setOnClickListener(new View.OnClickListener() {
@@ -98,8 +159,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        currentUser = firebaseAuth.getCurrentUser();
-        firebaseAuth.addAuthStateListener(authStateListener);
+
+
     }
 
     @Override
