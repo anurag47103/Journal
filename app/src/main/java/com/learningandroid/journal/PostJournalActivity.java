@@ -3,8 +3,12 @@ package com.learningandroid.journal;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,14 +16,24 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -50,6 +64,11 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
     private int postActionId;
     Journal journal_from_list;
 
+    FusedLocationProviderClient client;
+
+    private LatLng currentLatLnd;
+    private GeoPoint geoPoint;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,11 +78,13 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
         postActionId = getIntent().getIntExtra("toUpdate", 0);
         journal_from_list = getIntent().getParcelableExtra("journal");
 
-        if(postActionId == 1) {
-            String imgUrl= journal_from_list.getImageUri();
-            String title=journal_from_list.getTitle();
-            String thought=journal_from_list.getThought();
-            
+        //if we are updating the Journal
+        if (postActionId == 1) {
+            String imgUrl = journal_from_list.getImageUri();
+            String title = journal_from_list.getTitle();
+            String thought = journal_from_list.getThought();
+            geoPoint = journal_from_list.getGeoPoint();
+
             binding.posttitleEditText.setText(journal_from_list.getTitle());
             binding.postThoughtEditText.setText(journal_from_list.getThought());
 
@@ -71,7 +92,7 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
                     .placeholder(R.drawable.bk_photo_1)
                     .fit()
                     .into(binding.backgroundImageView);
-            
+
             binding.postSaveButton.setText("Update");
         }
 
@@ -82,7 +103,7 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
         binding.addPhotoButton.setOnClickListener(this);
         binding.postSaveButton.setOnClickListener(this);
 
-        if(JournalApi.getInstance()!=null) {
+        if (JournalApi.getInstance() != null) {
             currentUserId = JournalApi.getInstance().getUserId();
             currentUserName = JournalApi.getInstance().getUsername();
 
@@ -90,15 +111,63 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
 
         authStateListener = firebaseAuth -> {
             user = firebaseAuth.getCurrentUser();
-            if(user != null) {
+            if (user != null) {
 
-            }
-            else {
+            } else {
 
             }
 
         };
 
+        binding.locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ActivityCompat.checkSelfPermission(PostJournalActivity.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    setCurrentLocation();
+                } else {
+                    ActivityCompat.requestPermissions(PostJournalActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
+                }
+            }
+
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 44) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setCurrentLocation();
+            }
+        }
+    }
+
+    private void setCurrentLocation() {
+
+        client = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Task<Location> task = client.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if(location != null) {
+                    geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    currentLatLnd = new LatLng(location.getLatitude(), location.getLongitude());
+                    Toast.makeText(PostJournalActivity.this, "loc" + currentLatLnd.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void saveJournal() {
@@ -133,6 +202,7 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
                                                 journal.setUserName(currentUserName);
                                                 journal.setUserId(currentUserId);
                                                 journal.setJournalId(collectionReference.document().getId());
+                                                if(geoPoint != null) journal.setGeoPoint(geoPoint);
 
 
                                                 collectionReference.document(journal.getJournalId()).set(journal)
@@ -189,6 +259,8 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
         else {
 
         }
+
+
     }
 
     @Override
@@ -290,6 +362,8 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
         j.setUserName(currentUserName);
         j.setUserId(currentUserId);
         j.setJournalId(journal_from_list.getJournalId());
+        if(geoPoint != null) j.setGeoPoint(geoPoint);
+
 
         collectionReference.document(journal_from_list.getJournalId())
                 .set(j).addOnSuccessListener(new OnSuccessListener<Void>() {

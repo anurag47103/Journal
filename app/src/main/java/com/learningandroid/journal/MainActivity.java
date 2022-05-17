@@ -6,9 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,7 +20,16 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -31,10 +44,12 @@ import java.util.Objects;
 import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
+
+
     BiometricPrompt biometricPrompt;
     androidx.biometric.BiometricPrompt.PromptInfo promptInfo;
     LinearLayout mMainLayout;
-    
+
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseUser currentUser;
@@ -48,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
+
 
         mMainLayout = findViewById(R.id.main_layouts);
 
@@ -74,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAuthenticationSucceeded(@NonNull androidx.biometric.BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                Toast.makeText(getApplicationContext(), "Login Sucess" , Toast.LENGTH_SHORT).show();;
+                Toast.makeText(getApplicationContext(), "Login Sucess", Toast.LENGTH_SHORT).show();
                 mMainLayout.setVisibility(View.VISIBLE);
 
                 currentUser = firebaseAuth.getCurrentUser();
@@ -89,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        promptInfo =  new BiometricPrompt.PromptInfo.Builder().setTitle("Journal")
+        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Journal")
                 .setDescription("Use FingerPrint To Login")
                 .setDeviceCredentialAllowed(true)
                 .build();
@@ -128,8 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
                                             finish();
                                         }
-                                    }
-                                    else {
+                                    } else {
 
                                     }
                                 }
@@ -143,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
 
-
         getStartedButton = findViewById(R.id.startButton);
 
         getStartedButton.setOnClickListener(new View.OnClickListener() {
@@ -155,6 +169,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+
 
     @Override
     protected void onStart() {

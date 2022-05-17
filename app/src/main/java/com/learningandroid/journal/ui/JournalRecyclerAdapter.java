@@ -22,6 +22,8 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
@@ -36,6 +38,7 @@ import com.google.firebase.storage.StorageReference;
 import com.learningandroid.journal.JournalListActivity;
 import com.learningandroid.journal.PostJournalActivity;
 import com.learningandroid.journal.R;
+import com.learningandroid.journal.googleMapActivity;
 import com.learningandroid.journal.model.Journal;
 import com.squareup.picasso.Picasso;
 
@@ -50,6 +53,8 @@ public class JournalRecyclerAdapter extends RecyclerView.Adapter<JournalRecycler
     private ProgressBar progressBarDelete;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Journal");
+
+    SupportMapFragment supportMapFragment;
 
 
     public JournalRecyclerAdapter(Context context, List<Journal> journalList) {
@@ -105,6 +110,22 @@ public class JournalRecyclerAdapter extends RecyclerView.Adapter<JournalRecycler
             }
         });
 
+        holder.viewLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(journal.getGeoPoint() == null) {
+                    Toast.makeText(context, "no location added", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent myIntent = new Intent(context, googleMapActivity.class);
+                LatLng latLng = new LatLng(journal.getGeoPoint().getLatitude(), journal.getGeoPoint().getLongitude());
+                myIntent.putExtra("latLng", latLng);
+                context.startActivity(myIntent);
+
+            }
+        });
+
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,6 +153,7 @@ public class JournalRecyclerAdapter extends RecyclerView.Adapter<JournalRecycler
 
         String userID, username;
         public ImageButton shareButton;
+        public ImageButton viewLocationButton;
 
         public ViewHolder(@NonNull View itemView, Context ctx) {
             super(itemView);
@@ -142,6 +164,7 @@ public class JournalRecyclerAdapter extends RecyclerView.Adapter<JournalRecycler
             dateAdded = itemView.findViewById(R.id.journal_timestamp_list);
             image = itemView.findViewById(R.id.journal_image_list);
             shareButton = itemView.findViewById(R.id.journal_row_share_button);
+            viewLocationButton = itemView.findViewById(R.id.viewLocationButton);
 
 
 

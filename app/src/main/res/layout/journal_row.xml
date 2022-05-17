@@ -6,23 +6,32 @@
     android:layout_margin="12dp"
     app:cardCornerRadius="8dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="10dp"
-        android:gravity="end"
         android:orientation="horizontal">
 
 
         <ImageButton
             android:id="@+id/journal_row_share_button"
             android:layout_width="wrap_content"
+            android:layout_alignParentRight="true"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:src="@android:drawable/ic_menu_share" />
 
+        <ImageButton
+            android:id="@+id/viewLocationButton"
+            android:layout_width="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_baseline_location_row"/>
 
-    </LinearLayout>
+
+    </RelativeLayout>
 
 
     <LinearLayout
