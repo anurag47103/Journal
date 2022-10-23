@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                                         for (QueryDocumentSnapshot snapshot : value) {
                                             JournalApi journalApi = JournalApi.getInstance();
                                             journalApi.setUserId(snapshot.getString("userId"));
-                                            journalApi.setUsername(snapshot.getString("username"));
+                                            journalApi.setUserName(snapshot.getString("username"));
 
                                             startActivity(new Intent(MainActivity.this,
                                                     JournalListActivity.class));
@@ -175,8 +175,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-
     }
 
     @Override

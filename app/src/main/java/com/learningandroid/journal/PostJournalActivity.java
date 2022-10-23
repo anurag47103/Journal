@@ -47,7 +47,8 @@ import java.util.Objects;
 
 public class PostJournalActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int GALLERY_CODE = 1;
-    private static final String TAG = "postjournalactivity";
+    private static final int CAMERA_CODE = 2;
+    private static final String TAG = "check";
     ActivityPostJournalBinding binding;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
@@ -65,7 +66,6 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
     Journal journal_from_list;
 
     FusedLocationProviderClient client;
-
     private LatLng currentLatLnd;
     private GeoPoint geoPoint;
 
@@ -79,14 +79,46 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
         journal_from_list = getIntent().getParcelableExtra("journal");
 
         //if we are updating the Journal
-        if (postActionId == 1) {
-            String imgUrl = journal_from_list.getImageUri();
-            String title = journal_from_list.getTitle();
-            String thought = journal_from_list.getThought();
-            geoPoint = journal_from_list.getGeoPoint();
+        if (JournalApi.getInstance() != null) {
+            currentUserId = JournalApi.getInstance().getUserId();
+            currentUserName = JournalApi.getInstance().getUserName();
+        }
 
-            binding.posttitleEditText.setText(journal_from_list.getTitle());
-            binding.postThoughtEditText.setText(journal_from_list.getThought());
+        Log.d(TAG, "cehck - " + postActionId);
+
+        if (postActionId != 0) {
+            String imgUrl;
+            String title;
+            String thought;
+            if(journal_from_list != null) {
+                imgUrl = journal_from_list.getImageUri();
+                title = journal_from_list.getTitle();
+                thought = journal_from_list.getThought();
+                geoPoint = journal_from_list.getGeoPoint();
+
+                JournalApi.getInstance().setImageUri(imgUrl);
+                JournalApi.getInstance().setTitle(title);
+                JournalApi.getInstance().setThought(thought);
+                JournalApi.getInstance().setGeoPoint(geoPoint);
+            }
+            else {
+                imgUrl = JournalApi.getInstance().getImageUri();
+                title = JournalApi.getInstance().getTitle();
+                thought = JournalApi.getInstance().getThought();
+                geoPoint = JournalApi.getInstance().getGeoPoint();
+            }
+
+            if(postActionId == 2) {
+                imgUrl = getIntent().getStringExtra("RESULTuri");
+//                Toast.makeText(this, postActionId, Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "imgURl - " + imgUrl);
+
+            }
+
+
+
+            binding.posttitleEditText.setText(title);
+            binding.postThoughtEditText.setText(thought);
 
             Picasso.get().load(imgUrl)
                     .placeholder(R.drawable.bk_photo_1)
@@ -103,11 +135,7 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
         binding.addPhotoButton.setOnClickListener(this);
         binding.postSaveButton.setOnClickListener(this);
 
-        if (JournalApi.getInstance() != null) {
-            currentUserId = JournalApi.getInstance().getUserId();
-            currentUserName = JournalApi.getInstance().getUsername();
 
-        }
 
         authStateListener = firebaseAuth -> {
             user = firebaseAuth.getCurrentUser();
@@ -274,19 +302,28 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
                 binding.addPhotoButton.setVisibility(View.GONE);
             }
         }
+        
+        if(requestCode == CAMERA_CODE && resultCode == RESULT_OK) {
+            if(data != null) {
+                Toast.makeText(this, "working", Toast.LENGTH_SHORT).show();
+                
+            }
+        }
     }
 
     @Override
     public void onClick(View view) {
         switch(view.getId()) {
             case R.id.addPhotoButton:
-                //saveJournal
                 Intent galleryIntent  = new Intent(Intent.ACTION_GET_CONTENT);
                 galleryIntent.setType("image/*");
                 startActivityForResult(galleryIntent, GALLERY_CODE);
+
+//                Intent cameraIntent = new Intent(PostJournalActivity.this, CameraActivity.class);
+//                startActivityForResult(cameraIntent,CAMERA_CODE);
+                    
                 break;
             case R.id.postSaveButton:
-                //get image from gallery phone
                 if(postActionId==0) saveJournal();
                 else if(postActionId==1) updateJournal();
                 break;

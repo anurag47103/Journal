@@ -4,7 +4,10 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.any" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".util.JournalApi"
@@ -14,10 +17,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Journal">
+        <activity
+            android:name=".EditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CameraActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCzbkcsMcb6_wmi9vDOn53e-f_uxyBYThw"/>
+            android:value="AIzaSyCzbkcsMcb6_wmi9vDOn53e-f_uxyBYThw" />
+
         <activity
             android:name=".googleMapActivity"
             android:exported="false" />
@@ -35,6 +45,12 @@
             android:exported="false"
             android:label="@string/title_activity_login"
             android:theme="@style/Theme.Journal.NoActionBar" />
+
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -35,13 +35,9 @@ import com.learningandroid.journal.util.JournalApi;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private AppBarConfiguration appBarConfiguration;
     private ActivityLoginBinding binding;
 
     private FirebaseAuth firebaseAuth;
-    private FirebaseAuth.AuthStateListener authStateListener;
-    private FirebaseUser currentUser;
-
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Users");
 
@@ -103,10 +99,10 @@ public class LoginActivity extends AppCompatActivity {
                                                     if(!value.isEmpty()) {
                                                         for(QueryDocumentSnapshot snapshot : value) {
                                                             JournalApi journalApi = JournalApi.getInstance();
-                                                            journalApi.setUsername(snapshot.getString("username"));
+                                                            journalApi.setUserName(snapshot.getString("username"));
                                                             journalApi.setUserId(currentUserId);
 
-                                                            //GO to listactivity
+                                                            //go to listactivity
                                                             startActivity(new Intent(LoginActivity.this,
                                                                     JournalListActivity.class));
                                                         }
@@ -118,8 +114,6 @@ public class LoginActivity extends AppCompatActivity {
                                     binding.loginProgress.setVisibility(View.INVISIBLE);
                                     Toast.makeText(LoginActivity.this, "Credentials sahi nai hai", Toast.LENGTH_SHORT).show();
                                 }
-                                
-
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {

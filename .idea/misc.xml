@@ -8,7 +8,9 @@
         <entry key="app/src/main/res/drawable/ic_baseline_add_location_row.xml" value="0.365" />
         <entry key="app/src/main/res/drawable/ic_baseline_location_row.xml" value="0.365" />
         <entry key="app/src/main/res/drawable/input_outline.xml" value="0.554" />
+        <entry key="app/src/main/res/layout/activity_camera.xml" value="0.5463541666666667" />
         <entry key="app/src/main/res/layout/activity_create_account.xml" value="0.5333333333333333" />
+        <entry key="app/src/main/res/layout/activity_edit.xml" value="0.48072916666666665" />
         <entry key="app/src/main/res/layout/activity_google_map.xml" value="0.5609375" />
         <entry key="app/src/main/res/layout/activity_journal_list.xml" value="0.5609375" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.5333333333333333" />

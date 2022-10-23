@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -31,13 +32,13 @@ import java.util.Objects;
 public class CreateAccountActivity extends AppCompatActivity {
 
     private ActivityCreateAccountBinding binding;
+
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseUser currentUser;
 
-    //Firestore connection
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference collectionReference = db.collection("Users");
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final CollectionReference collectionReference = db.collection("Users");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,6 @@ public class CreateAccountActivity extends AppCompatActivity {
 
             if(currentUser != null) {
                 //user is already logged in...
-
             }
             else {
                 //no user yet....
@@ -91,8 +91,10 @@ public class CreateAccountActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()) {
+
                                 //we take user to AddJournalActivity
                                 currentUser = firebaseAuth.getCurrentUser();
+                                assert currentUser != null;
                                 String currentUserId = currentUser.getUid();
 
                                 //create a user map so we can create a user in the user collection
@@ -110,16 +112,13 @@ public class CreateAccountActivity extends AppCompatActivity {
                                                             @Override
                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                                 if(task.getResult().exists()) {
-                                                                    String name = task.getResult()
-                                                                            .getString("username");
+                                                                    String name = task.getResult().getString("username");
 
                                                                     JournalApi journalApi = JournalApi.getInstance();
                                                                     journalApi.setUserId(currentUserId);
-                                                                    journalApi.setUsername(name);
+                                                                    journalApi.setUserName(name);
 
                                                                     Intent intent = new Intent(CreateAccountActivity.this, PostJournalActivity.class);
-                                                                    intent.putExtra("username", name);
-                                                                    intent.putExtra("userId", currentUserId);
                                                                     startActivity(intent);
                                                                 }
                                                                 binding.acctProgress.setVisibility(View.INVISIBLE);
@@ -130,7 +129,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-
+                                                Log.e("firebaseError", "onFailure: User information could not be stored in database", e);
                                             }
                                         });
 
@@ -141,7 +140,8 @@ public class CreateAccountActivity extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-
+                            Toast.makeText(CreateAccountActivity.this, "Could not create the account", Toast.LENGTH_SHORT).show();
+                            Log.e("firebaseError", "onFailure: Could not create the account", e);
                         }
                     });
     }
